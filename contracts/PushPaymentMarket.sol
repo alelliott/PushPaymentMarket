@@ -87,10 +87,10 @@ contract PushPaymentMarket is Ownable, Pausable, ReentrancyGuard {
         uint256 fee = _amount * feeBasisPoints / 10000;
         uint256 amountAfterFee = _amount - fee;
 
+        emit Purchase(msg.sender, _vendorId, _orderId, amountAfterFee, _token);
+
         require(IERC20(_token).transferFrom(msg.sender, vendors[_vendorId], amountAfterFee), "Transfer to vendor failed");
         require(IERC20(_token).transferFrom(msg.sender, feeRecipient, fee), "Transfer of fee failed");
-
-        emit Purchase(msg.sender, _vendorId, _orderId, amountAfterFee, _token);
     }
 
     function purchaseWithEther(uint256 _vendorId, uint256 _orderId) public payable nonReentrant whenNotPaused {
@@ -100,10 +100,10 @@ contract PushPaymentMarket is Ownable, Pausable, ReentrancyGuard {
         uint256 fee = msg.value * feeBasisPoints / 10000;
         uint256 amountAfterFee = msg.value - fee;
 
+        emit Purchase(msg.sender, _vendorId, _orderId, amountAfterFee, address(0));
+
         vendors[_vendorId].transfer(amountAfterFee);
         feeRecipient.transfer(fee);
-
-        emit Purchase(msg.sender, _vendorId, _orderId, amountAfterFee, address(0));
     }
 
     function pause() external onlyOwner {
